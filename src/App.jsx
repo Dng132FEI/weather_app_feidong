@@ -58,9 +58,9 @@ export default function App() {
    * update current weather data in WeatherDisplay component.
    * If the country searched is already in the search history, remove that search history record
    * and add the current search record in so that the time when the country is searched is updated.
-   * @param {*} getWeatherDataCity "city" variable to be passed into API call to OpenWeatherAPI.
-   * @param {*} getWeatherDataCountry "country code" variable to be passed into API call to OpenWeatherAPI.
-   * @param {*} units "metric", "imperial" or "standard"
+   * @param { String } getWeatherDataCity "city" variable to be passed into API call to OpenWeatherAPI.
+   * @param { String } getWeatherDataCountry "country code" variable to be passed into API call to OpenWeatherAPI.
+   * @param { String } units "metric", "imperial" or "standard"
    */
   const callGetWeatherData = (getWeatherDataCity, getWeatherDataCountry, units) => {
     getCurrentWeatherData(getWeatherDataCity, getWeatherDataCountry, APPID, units).then((value) => {
