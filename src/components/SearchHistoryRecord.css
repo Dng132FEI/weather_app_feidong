@@ -1,0 +1,29 @@
+.search-history-record {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.2rem;
+  margin-bottom: 1.2rem;
+  background: linear-gradient(rgba(255,255,255,0.15), rgba(255,255,255,0.15))rgba(255,255,255,0.15);
+  border-radius: 1.2rem;
+}
+
+.search-history-record-right-section {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.search-history-record-icons-section {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.mobile-record-font {
+  font-size: 0.8rem;
+}
+
+.mobile-search-time-font {
+  font-size: 0.72rem;
+}

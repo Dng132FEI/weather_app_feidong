@@ -1,15 +1,14 @@
-import React from 'react';
-import { useState } from "react";
+import React, { useCallback } from 'react';
+import { useState, useEffect } from "react";
 
 import Searchbar from './components/Searchbar';
 import WeatherDisplay from './components/WeatherDisplay'
 import SearchHistory from './components/SearchHistory';
-
 import Alert from 'react-bootstrap/Alert';
 
 import { getCurrentWeatherData } from './services/GetCurrentWeatherData';
 
-import { APPID } from './constants/constants';
+import { APPID, MOBILE_VIEW_THRESHOLD_WIDTH, DEFAULT_CITY, DEFAULT_COUNTRY } from './constants/constants';
 
 import "./App.css";
 
@@ -37,42 +36,44 @@ export default function App() {
   /** Search history array, pre-populated with some mock values for now */
   const [history, setHistory] = useState([
     {
-      city: "Mumbai",
-      countryCode: "IN",
+      city: "Ningbo",
+      countryCode: "CN",
       searchTime: "2025-01-09 03:15 PM"
     },
     {
       city: "Kyiv",
       countryCode: "UA",
       searchTime: "2025-01-09 03:18 PM"
-    },
-    {
-      city: "Fuzhou",
-      countryCode: "CN",
-      searchTime: "2025-01-09 03:22 PM"
     }
   ]);
+  
+  /** 
+   * Boolean to indicate whether the current screen is mobile view.
+   */
+  const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_VIEW_THRESHOLD_WIDTH);
 
   /**
    * Makes an API call to OpenWeatherAPI based on function inputs to obtain and 
    * update current weather data in WeatherDisplay component.
    * If the country searched is already in the search history, remove that search history record
    * and add the current search record in so that the time when the country is searched is updated.
+   * If no search result is returned from OpenWeatherAPI or if an error occurred while making the API call,
+   * display the "Not found" alert for 5 seconds.
    * @param { String } getWeatherDataCity "city" variable to be passed into API call to OpenWeatherAPI.
    * @param { String } getWeatherDataCountry "country code" variable to be passed into API call to OpenWeatherAPI.
    * @param { String } units "metric", "imperial" or "standard"
    */
-  const callGetWeatherData = (getWeatherDataCity, getWeatherDataCountry, units) => {
+  const callGetWeatherData = async(getWeatherDataCity, getWeatherDataCountry, units) => {
     getCurrentWeatherData(getWeatherDataCity, getWeatherDataCountry, APPID, units).then((value) => {
       var queryTime = moment.unix(value?.dt).format("YYYY-MM-DD hh:mm a");
       const newWeatherData = { // Extract only data that we need
         city: value?.name,
         countryCode: value?.sys?.country,
         weatherGroup: value?.weather?.[0]?.main,
-        description: value?.weather?.[0]?.description,
-        temp: value?.main?.temp,
-        tempMax: value?.main?.temp_max,
-        tempMin: value?.main?.temp_min,
+        description: value?.weather?.[0]?.description.charAt(0).toUpperCase() + value?.weather?.[0]?.description.slice(1),
+        temp: Math.round(value?.main?.temp),
+        tempMax: Math.round(value?.main?.temp_max),
+        tempMin: Math.round(value?.main?.temp_min),
         tempUnit: "°C", // For extendibility to other units.
         humidity: value?.main?.humidity,
         displayTime: queryTime
@@ -91,9 +92,12 @@ export default function App() {
         searchTime: newWeatherData?.displayTime
       })
       setHistory(newHistory);
-      setShowInvalidSearchAlert(false);
+      setShowInvalidSearchAlert(false); // Hide "Not found" alert if still displaying.
     }).catch((e)=>{
       setShowInvalidSearchAlert(true);
+      setTimeout(() => {
+        setShowInvalidSearchAlert(false);
+        }, 5000); // Display "Not found" alert for 5 seconds.
       console.error(e.message);
     });
   }
@@ -129,52 +133,80 @@ export default function App() {
     setHistory(newHistory);
   }
 
+  /**
+   * Set screen to mobile view if window width < 600px.
+   */
+  const updateIsMobile = useCallback(() => {
+    setIsMobile(window.innerWidth < MOBILE_VIEW_THRESHOLD_WIDTH);
+  }, []);
+
+  /**
+   * When the site is first loaded, obtain weather data for default city
+   * and set up event listener for "updateIsMobile". Also execute updateIsMobile()
+   * once to immediately check the screen width to verify if mobile view should be
+   * displayed.
+   */
+  useEffect(() => {
+    callGetWeatherData(DEFAULT_CITY, DEFAULT_COUNTRY, "metric"); // Load default city's weather data.
+    window.addEventListener("resize", updateIsMobile);
+    updateIsMobile();
+    return () => {
+      window.removeEventListener("resize", updateIsMobile);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [updateIsMobile]);
+
   return (
-    <div className="p-4">
+    <div className="weather-app-page" >
+      <div className="weather-app-contents">
 
-      {/* Page header */}
-      <div className="fw-bold pt-3 pb-1 border-bottom">Today's weather</div>
+        {/* Search bar with submit and reset buttons */}
+        <Searchbar
+          className="customSearchBar"
+          setCity={setCity}
+          setCountry={setCountry}
+          searchSubmit={searchSubmitHandler}
+          isMobile={isMobile}
+        ></Searchbar>
 
-      {/* Search bar with submit and reset buttons */}
-      <Searchbar
-        setCity={setCity}
-        setCountry={setCountry}
-        searchSubmit={searchSubmitHandler}
-      ></Searchbar>
+        {/* Display the "Not found" red banner (Bootstrap Alert) if necessary */}
+        {showInvalidSearchAlert ? (
+          <div className="invalid-search-alert">
+            <Alert 
+              variant="danger" 
+              onClose={() => setShowInvalidSearchAlert(false)} 
+              dismissible
+            >Not found</Alert>
+          </div>
+        ) :<></>}
 
-      {/* Display the "Not found" red banner (Bootstrap Alert) if necessary */}
-      {showInvalidSearchAlert ? (
-        <div className="mt-4">
-          <Alert 
-            variant="danger" 
-            onClose={() => setShowInvalidSearchAlert(false)} 
-            dismissible
-          >Not found</Alert>
+        <div className="weather-app-component">
+          {/* Display weather data if data is obtained successfully from OpenWeatherAPI */}
+          {Object.keys(weatherData).length !== 0 ? (
+            <WeatherDisplay
+              city={weatherData.city}
+              countryCode={weatherData.countryCode}
+              weatherGroup={weatherData.weatherGroup}
+              description={weatherData.description}
+              temp={weatherData.temp}
+              tempMax={weatherData.tempMax}
+              tempMin={weatherData.tempMin}
+              tempUnit={weatherData.tempUnit}
+              humidity={weatherData.humidity}
+              displayTime={weatherData.displayTime}
+              isMobile={isMobile}
+            ></WeatherDisplay>
+          ) :<></>}
+
+          {/* Search history section */}
+          <SearchHistory 
+            searchUsingHistoryRecord={searchUsingHistoryRecord}
+            deleteHistoryRecord={deleteHistoryRecord}
+            history={history}
+            isMobile={isMobile}
+          ></SearchHistory>
         </div>
-      ) :<></>}
-
-      {/* Display weather data if data is obtained successfully from OpenWeatherAPI */}
-      {Object.keys(weatherData).length !== 0 ? (
-        <WeatherDisplay
-          city={weatherData.city}
-          countryCode={weatherData.countryCode}
-          weatherGroup={weatherData.weatherGroup}
-          description={weatherData.description}
-          temp={weatherData.temp}
-          tempMax={weatherData.tempMax}
-          tempMin={weatherData.tempMin}
-          tempUnit={weatherData.tempUnit}
-          humidity={weatherData.humidity}
-          displayTime={weatherData.displayTime}
-        ></WeatherDisplay>
-      ) :<></>}
-
-      {/* Search history section */}
-      <SearchHistory 
-        searchUsingHistoryRecord={searchUsingHistoryRecord}
-        deleteHistoryRecord={deleteHistoryRecord}
-        history={history}
-      ></SearchHistory>
+      </div>
     </div>
   )
 }

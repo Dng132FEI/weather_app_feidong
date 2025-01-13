@@ -1,0 +1,89 @@
+.weather-display-component {
+  padding: 0 1.2rem 1.2rem 1.2rem;
+  position: relative;
+}
+
+.weather-display-component-mobile {
+  padding: 0 0.8rem 1.2rem 0.8rem;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 1.2rem;
+  align-items: end;
+}
+
+.weather-header {
+  font-weight: 600;
+}
+
+.weather-header-mobile {
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-wrap: nowrap;
+}
+
+.image {
+  position: absolute;
+  right: -1.2rem;
+  bottom: 0.8rem;
+}
+
+.image-mobile {
+  position: absolute;
+  right: -2rem;
+  bottom: 3.8rem;
+}
+
+.main-display {
+  color: rgb(92, 48, 158);
+  font-size: 2.4rem;
+  font-weight: bold;
+}
+
+.main-display-mobile {
+  color: rgb(92, 48, 158);
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.sub-display-mobile {
+  color: rgb(92, 48, 158);
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.weather-data-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.high-low-temperature-text {
+  font-weight: 600;
+}
+
+.high-low-temperature-text-mobile {
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.weather-data-semibold {
+  color: rgb(90, 90, 90);
+  font-weight: 600;
+}
+
+.weather-data-semibold-mobile {
+  color: rgb(90, 90, 90);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.weather-data {
+  color: rgb(90, 90, 90);
+}
+
+.weather-data-mobile {
+  color: rgb(90, 90, 90);
+  font-size: 0.8rem;
+  text-align: right;
+}
+  

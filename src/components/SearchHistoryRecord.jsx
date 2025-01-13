@@ -1,4 +1,6 @@
-import React from 'react'
+import React from 'react';
+
+import "./SearchHistoryRecord.css";
 
 /**
  * SearchHistoryRecord component, for displaying a single search history record within the SearchHistory component.
@@ -11,6 +13,7 @@ import React from 'react'
  * @param { String } props.city <current record>.city
  * @param { String } props.countryCode <current record>.countryCode
  * @param { String } props.searchTime <current record>.searchTime
+ * @param { boolean } props.isMobile For toggling mobile view.
  * @returns JSX for SearchHistoryRecord component.
  */
 const SearchHistoryRecord = ({ 
@@ -19,22 +22,37 @@ const SearchHistoryRecord = ({
   recordIndex, 
   city, 
   countryCode, 
-  searchTime 
+  searchTime,
+  isMobile
 }) => {
   return (
-    <div className="pt-3 pb-3 border-bottom d-flex justify-content-between align-items-center">
+    <div className="search-history-record">
 
-      {/*Left side: e.g. "1. Hong Kong, HK.*/}
-      <div>{ recordIndex + 1 }. {city}, {countryCode}</div>
+      {/* Mobile view left side (2 rows): "
+        *   1. Hong Kong, HK.
+        *   2025-01-09 03:15 PM
+        * "
+        * Normal view left side: "1. Hong Kong, HK."
+        */}  
+      {isMobile 
+        ? (
+          <div>
+            <div className="mobile-record-font">{ recordIndex + 1 }. {city}, {countryCode}</div>
+            <div className="mobile-search-time-font">{ searchTime }</div>
+          </div>
+        ): <div>{ recordIndex + 1 }. {city}, {countryCode}</div>
+      }
 
-      {/*Right side: e.g. 2025-01-09 03:15 PM <Search button> <Delete button>*/}
-      <div className="d-flex align-items-center gap-3">
+      {/*Mobile view right side: "<Search button> <Delete button>" 
+        * Normal view right side: e.g. "2025-01-09 03:15 PM <Search button> <Delete button>"  
+        */}
+      <div className="search-history-record-right-section">
 
         {/*Search time in YYYY-MM-DD hh:mm a (12-hour) format*/}
-        <div>{ searchTime }</div>
+        {isMobile ? <></> : <div>{ searchTime }</div>}
 
         {/*Icons section*/}
-        <div className="d-flex align-items-center gap-2">
+        <div className="search-history-record-icons-section">
 
           {/*Search icon*/}
           <div onClick={() => searchUsingHistoryRecord(recordIndex)} className="btn btn-icon-circle">

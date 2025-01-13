@@ -1,6 +1,18 @@
 // AppId for Open Weather API.
 export const APPID="04d98bcbd48b807c6ff99bbf3f450b5b";
 
+// Display limit for search history.
+export const DISPLAY_LIMIT = 5;
+
+// Threshold width for mobile view.
+export const MOBILE_VIEW_THRESHOLD_WIDTH = 650;
+
+// Country to be first loaded when app is opened.
+export const DEFAULT_COUNTRY = "SG";
+
+// City to be first loaded when app is opened.
+export const DEFAULT_CITY = "Singapore";
+
 /* All simple ISO 3166 country data
  * including: 2-character, 3-character, full country name and numeric code.
  * Sorted alphabetical by country name (special characters on bottom).

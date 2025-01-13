@@ -1,6 +1,9 @@
-import React from 'react'
+import React from 'react';
 
-import SearchHistoryRecord from './SearchHistoryRecord'
+import SearchHistoryRecord from './SearchHistoryRecord';
+import { DISPLAY_LIMIT } from '../constants/constants';
+
+import "./SearchHistory.css";
 
 /**
  * SearchHistory component containing the "Search History" header, and contains the list
@@ -11,26 +14,31 @@ import SearchHistoryRecord from './SearchHistoryRecord'
  * @param { Function } props.deleteHistoryRecord Handler for delete button click event (within any SearchHistoryRecord).
  * Takes in one parameter, which is the index of the target search history record.
  * @param { Array } props.history Search history array.
+ * @param { boolean } props.isMobile For toggling mobile view.
  * @returns JSX for SearchHistoryRecord component.
  */
-const SearchHistory = ({ searchUsingHistoryRecord, deleteHistoryRecord, history }) => {
+const SearchHistory = ({ searchUsingHistoryRecord, deleteHistoryRecord, history, isMobile }) => {
   return (
-    <>
+    <div className="weather-app-component-nested">
       {/* Search History header */}
-      <div className="fw-bold pt-3 pb-1 border-bottom">Search History</div>
+      <div className="search-history-title">Search History</div>
 
-      {/* Iterate through search history and display each record in a SearchHistoryRecord component. */}
-      {history.map((record, index)=>(
-        <SearchHistoryRecord 
-          searchUsingHistoryRecord={searchUsingHistoryRecord}
-          deleteHistoryRecord={deleteHistoryRecord}
-          recordIndex={index}
-          city={record?.city}
-          countryCode={record?.countryCode} 
-          searchTime={record?.searchTime}
-        ></SearchHistoryRecord> 
+      {/* Iterate through search history and display EACH OF THE FIRST <DISPLAY_LIMIT> RECORDS in a SearchHistoryRecord component. */}
+      {history.map((record, index)=>(index < DISPLAY_LIMIT 
+        ? (
+          <SearchHistoryRecord 
+            key={index}
+            searchUsingHistoryRecord={searchUsingHistoryRecord}
+            deleteHistoryRecord={deleteHistoryRecord}
+            recordIndex={index}
+            city={record?.city}
+            countryCode={record?.countryCode} 
+            searchTime={record?.searchTime}
+            isMobile={isMobile}
+          ></SearchHistoryRecord> 
+        ) : <></>
       ))}
-    </>
+    </div>
   )
 }
 
